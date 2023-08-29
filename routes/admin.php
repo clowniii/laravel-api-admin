@@ -80,6 +80,7 @@ Route::get('Fields/del', [FieldsController::class, "destroy"])->middleware([Admi
 Route::post('InterfaceGroup/add', [InterfaceGroupController::class, "create"])->middleware([AdminAuth::class, AdminPermission::class, AdminLog::class, AdminResponse::class]);
 Route::post('InterfaceGroup/edit', [InterfaceGroupController::class, "edit"])->middleware([AdminAuth::class, AdminPermission::class, AdminLog::class, AdminResponse::class]);
 Route::get('InterfaceGroup/del', [InterfaceGroupController::class, "destroy"])->middleware([AdminAuth::class, AdminPermission::class, AdminLog::class, AdminResponse::class]);
+
 Route::get('InterfaceGroup/getAll', [InterfaceGroupController::class, "getAll"])->middleware([AdminAuth::class, AdminPermission::class, AdminLog::class, AdminResponse::class]);
 Route::get('InterfaceGroup/changeStatus', [InterfaceGroupController::class, "changeStatus"])->middleware([AdminAuth::class, AdminPermission::class, AdminLog::class, AdminResponse::class]);
 

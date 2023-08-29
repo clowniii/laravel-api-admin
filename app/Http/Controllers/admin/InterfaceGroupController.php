@@ -52,9 +52,9 @@ class InterfaceGroupController extends BaseController
      */
     public function getAll()
     {
-        $listInfo = (new ApiGroup())->where(['status' => 1])->select();
+        $listInfo = (new ApiGroup())->where(['status' => 1])->get();
         return $this->buildSuccess([
-            'list' => $listInfo
+            'list' => $listInfo->toArray()
         ]);
     }
 
