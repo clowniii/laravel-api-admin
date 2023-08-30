@@ -35,13 +35,6 @@ class AdminUserData extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'login_times',
-        'last_login_ip',
-        'last_login_time',
-        'uid',
-        'head_img',
-    ];
 
     protected int         $id;
     protected int         $login_times;//账号登录次数
@@ -51,4 +44,14 @@ class AdminUserData extends Model
     protected string|null $head_img;//用户头像
 
     protected $table = "admin_user_data";
+
+    protected $fillable = [
+        'login_times',
+        'last_login_ip',
+        'last_login_time',
+        'uid',
+        'head_img',
+    ];
+
+
 }

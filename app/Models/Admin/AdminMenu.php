@@ -68,4 +68,21 @@ class AdminMenu extends Model
     protected int    $log;
     protected int    $permission;
     protected int    $method;
+
+    protected $fillable = [
+        'id',
+        'title',
+        'fid',
+        'url',
+        'auth',
+        'sort',
+        'show',
+        'icon',
+        'level',
+        'component',
+        'router',
+        'log',
+        'permission',
+        'method',
+    ];
 }

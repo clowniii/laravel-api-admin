@@ -3,16 +3,18 @@
 namespace App\Models\Admin;
 
 use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\Admin\AdminApp
  *
  * @mixin Eloquent
- * @method static \Illuminate\Database\Eloquent\Builder|AdminApp newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|AdminApp newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|AdminApp query()
+ * @method static Builder|ApiApp newModelQuery()
+ * @method static Builder|ApiApp newQuery()
+ * @method static Builder|ApiApp query()
  * @property int $id
  * @property string $app_id 应用id
  * @property string $app_secret 应用密码
@@ -23,20 +25,20 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $app_group 当前应用所属的应用组唯一标识
  * @property int $app_add_time 应用创建时间
  * @property string|null $app_api_show 前台样式显示所需数据格式
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @method static \Illuminate\Database\Eloquent\Builder|AdminApp whereAppAddTime($value)
- * @method static \Illuminate\Database\Eloquent\Builder|AdminApp whereAppApi($value)
- * @method static \Illuminate\Database\Eloquent\Builder|AdminApp whereAppApiShow($value)
- * @method static \Illuminate\Database\Eloquent\Builder|AdminApp whereAppGroup($value)
- * @method static \Illuminate\Database\Eloquent\Builder|AdminApp whereAppId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|AdminApp whereAppInfo($value)
- * @method static \Illuminate\Database\Eloquent\Builder|AdminApp whereAppName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|AdminApp whereAppSecret($value)
- * @method static \Illuminate\Database\Eloquent\Builder|AdminApp whereAppStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|AdminApp whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|AdminApp whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|AdminApp whereUpdatedAt($value)
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @method static Builder|ApiApp whereAppAddTime($value)
+ * @method static Builder|ApiApp whereAppApi($value)
+ * @method static Builder|ApiApp whereAppApiShow($value)
+ * @method static Builder|ApiApp whereAppGroup($value)
+ * @method static Builder|ApiApp whereAppId($value)
+ * @method static Builder|ApiApp whereAppInfo($value)
+ * @method static Builder|ApiApp whereAppName($value)
+ * @method static Builder|ApiApp whereAppSecret($value)
+ * @method static Builder|ApiApp whereAppStatus($value)
+ * @method static Builder|ApiApp whereCreatedAt($value)
+ * @method static Builder|ApiApp whereId($value)
+ * @method static Builder|ApiApp whereUpdatedAt($value)
  */
 class ApiApp extends Model
 {
@@ -54,4 +56,17 @@ class ApiApp extends Model
     protected string      $app_group;//当前应用所属的应用组唯一标识
     protected int         $app_add_time;//应用创建时间
     protected string|null $app_api_show;//前台样式显示所需数据格式
+
+    protected $fillable = [
+        'id',
+        'app_id',
+        'app_secret',//应用密码
+        'app_name',//应用名称
+        'app_status',//应用状态：0表示禁用，1表示启用
+        'app_info',//应用说明
+        'app_api',//当前应用允许请求的全部API接口
+        'app_group',//当前应用所属的应用组唯一标识
+        'app_add_time',//应用创建时间
+        'app_api_show'//前台样式显示所需数据格式
+    ];
 }

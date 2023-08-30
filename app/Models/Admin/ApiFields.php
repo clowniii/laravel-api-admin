@@ -55,4 +55,17 @@ class ApiFields extends Model
     protected string $info;//字段说明
     protected int    $type;//字段用处：0为request，1为response
     protected string $show_name;//wiki显示用字段
+
+    protected $fillable = [
+        'id',
+        'field_name',
+        'hash',
+        'data_type',
+        'default',
+        'is_must',
+        'range',
+        'info',
+        'type',
+        'show_name',
+    ];
 }

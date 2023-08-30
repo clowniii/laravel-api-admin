@@ -56,4 +56,18 @@ class ApiList extends Model
     protected string|null $return_str;//返回数据示例
     protected string      $group_hash;// 当前接口所属的接口分组
     protected int         $hash_type;//是否采用hash映射， 1：普通模式 2：加密模式
+
+    protected $fillable = [
+        '$id',
+        '$api_class',
+        '$hash',
+        '$access_token',
+        '$status',
+        '$method',
+        '$info',
+        '$is_test',
+        '$return_str',
+        '$group_hash',
+        '$hash_type',
+    ];
 }

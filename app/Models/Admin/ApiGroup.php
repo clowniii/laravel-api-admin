@@ -50,4 +50,16 @@ class ApiGroup extends Model
     protected int         $update_time;//修改时间
     protected string|null $image;//分组封面图
     protected int         $hot;//分组热度
+
+    protected $fillable = [
+        'id',
+        'name',
+        'description',
+        'status',
+        'hash',
+        'create_time',
+        'update_time',
+        'image',
+        'hot',
+    ];
 }

@@ -37,4 +37,12 @@ class ApiAppGroup extends Model
     protected string|null $description;// 组说明
     protected int         $status;//组：0表示禁用，1表示启用
     protected string      $hash;//组标识
+
+    protected $fillable = [
+        'id',
+        'name',
+        'description',
+        'status',
+        'hash',
+    ];
 }

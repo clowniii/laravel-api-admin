@@ -30,5 +30,14 @@ use Illuminate\Database\Eloquent\Model;
 class AdminAuthRule extends Model
 {
     use HasFactory;
+
     protected $table = "admin_auth_rule";
+
+    protected $fillable = [
+        'id',
+        'url',
+        'group_id',
+        'auth',
+        'status',
+    ];
 }

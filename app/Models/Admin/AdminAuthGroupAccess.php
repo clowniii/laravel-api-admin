@@ -32,4 +32,10 @@ class AdminAuthGroupAccess extends Model
     protected int    $id;
     protected int    $uid;
     protected string $group_id;
+
+    protected $fillable = [
+        'id',
+        'uid',
+        'group_id',
+    ];
 }

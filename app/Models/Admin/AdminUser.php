@@ -58,6 +58,18 @@ class AdminUser extends Model
     protected array  $menu;
     protected string $apiAuth;
 
+    protected $fillable = [
+        'id',
+        'username',
+        'nickname',
+        'password',
+        'create_time',
+        'create_ip',
+        'update_time',
+        'status',
+        'openid',
+    ];
+
     public function userData(): HasOne
     {
         return $this->hasOne(AdminUserData::class, 'uid', 'id');

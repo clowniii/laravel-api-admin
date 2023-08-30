@@ -41,7 +41,7 @@ class AdminLog
             'nickname'    => $userInfo['nickname'],
             'add_time'    => time(),
             'url'         => $request->path(),
-            'data'        => json_encode($request->all())
+            'data'        => json_encode($request->except('API_ADMIN_USER_INFO'))
         ]);
         return $next($request);
     }

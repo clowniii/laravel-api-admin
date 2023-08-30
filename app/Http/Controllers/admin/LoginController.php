@@ -10,6 +10,7 @@ use App\Models\Admin\AdminUserData;
 use App\tools\ReturnCode;
 use App\tools\RouterTool;
 use App\tools\Tools;
+use Cache;
 use Illuminate\Http\Request;
 
 class LoginController extends BaseController
@@ -84,8 +85,8 @@ class LoginController extends BaseController
     public function logout(): array
     {
         $ApiAuth = $this->request->header('Api-Auth');
-        cache('Login:' . $ApiAuth, null);
-        cache('Login:' . $this->userInfo['id'], null);
+        Cache::delete('Login:' . $ApiAuth);
+        Cache::delete('Login:' . $this->userInfo['id']);
 
         return $this->buildSuccess([], '登出成功');
     }

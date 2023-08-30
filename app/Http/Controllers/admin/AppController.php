@@ -13,6 +13,14 @@ use Illuminate\Support\Facades\DB;
 
 class AppController extends BaseController
 {
+    protected ?ApiApp $model = null;
+
+    public function __construct(Request $request)
+    {
+        parent::__construct($request);
+        $this->model = new ApiApp();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -21,13 +29,13 @@ class AppController extends BaseController
     public function index(Request $request)
     {
         //
-        $limit    = $request->input("size", config("laravelapi.limit_default"));
+        $limit    = $request->get("size", config("laravelapi.limit_default"));
         $start    = $request->get('page', 1);
         $keywords = $request->get('keywords', '');
         $type     = $request->get('type', '');
         $status   = $request->get('status', '');
 
-        $obj = new ApiApp();
+        $obj = $this->model;
         if (strlen($status)) {
             $obj = $obj->where('app_status', $status);
         }
