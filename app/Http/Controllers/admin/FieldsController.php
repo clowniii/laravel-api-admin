@@ -7,11 +7,17 @@ use App\Models\Admin\ApiList;
 use App\tools\DataType;
 use App\tools\ReturnCode;
 use App\tools\Tools;
+use Cache;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class FieldsController extends BaseController
 {
+    public function __construct(Request $request)
+    {
+        parent::__construct($request);
+        $this->modelObj = new ApiFields();
+    }
 
     private array $dataType = [
         DataType::TYPE_INTEGER => 'Integer',
@@ -37,7 +43,7 @@ class FieldsController extends BaseController
 
     public function request(): array
     {
-        $limit = $this->request->get('size', config('apiadmin.ADMIN_LIST_DEFAULT'));
+        $limit = $this->request->get('size', config('laravelapi.list_default'));
         $start = $this->request->get('page', 1);
         $hash  = $this->request->get('hash', '');
 
@@ -45,21 +51,21 @@ class FieldsController extends BaseController
             return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
         $listObj = (new ApiFields())->where('hash', $hash)->where('type', 0)
-            ->paginate(['page' => $start, 'list_rows' => $limit])->toArray();
+            ->paginate(['page' => $start, 'list_rows' => $limit]);
 
         $apiInfo = (new ApiList())->where('hash', $hash)->first();
 
         return $this->buildSuccess([
-            'list'     => $listObj['data'],
-            'count'    => $listObj['total'],
+            'list'     => $listObj->items(),
+            'count'    => $listObj->total(),
             'dataType' => $this->dataType,
-            'apiInfo'  => $apiInfo
+            'apiInfo'  => $apiInfo->toArray()
         ]);
     }
 
     public function response(): array
     {
-        $limit = $this->request->get('size', config('apiadmin.ADMIN_LIST_DEFAULT'));
+        $limit = $this->request->get('size', config('laravelapi.list_default'));
         $start = $this->request->get('page', 1);
         $hash  = $this->request->get('hash', '');
 
@@ -67,15 +73,15 @@ class FieldsController extends BaseController
             return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
         $listObj = (new ApiFields())->where('hash', $hash)->where('type', 1)
-            ->paginate(['page' => $start, 'list_rows' => $limit])->toArray();
+            ->paginate(['page' => $start, 'list_rows' => $limit]);
 
         $apiInfo = (new ApiList())->where('hash', $hash)->first();
 
         return $this->buildSuccess([
-            'list'     => $listObj['data'],
-            'count'    => $listObj['total'],
+            'list'     => $listObj->items(),
+            'count'    => $listObj->total(),
             'dataType' => $this->dataType,
-            'apiInfo'  => $apiInfo
+            'apiInfo'  => $apiInfo->toArray()
         ]);
     }
 
@@ -92,9 +98,9 @@ class FieldsController extends BaseController
         unset($postData['defaults']);
         $res = ApiFields::create($postData);
 
-        cache('RequestFields:NewRule:' . $postData['hash'], null);
-        cache('RequestFields:Rule:' . $postData['hash'], null);
-        cache('ResponseFieldsRule:' . $postData['hash'], null);
+
+        $this->__deleteCacheOfRequestFields($postData['hash']);
+
 
         if ($res === false) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
@@ -117,9 +123,8 @@ class FieldsController extends BaseController
         unset($postData['defaults']);
         $res = (new ApiFields())->update($postData);
 
-        cache('RequestFields:NewRule:' . $postData['hash'], null);
-        cache('RequestFields:Rule:' . $postData['hash'], null);
-        cache('ResponseFieldsRule:' . $postData['hash'], null);
+
+        $this->__deleteCacheOfRequestFields($postData['hash']);
 
         if ($res === false) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
@@ -128,17 +133,6 @@ class FieldsController extends BaseController
         return $this->buildSuccess();
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
 
     /**
      * Remove the specified resource from storage.
@@ -153,9 +147,9 @@ class FieldsController extends BaseController
         }
 
         $fieldsInfo = (new ApiFields())->where('id', $id)->first();
-        cache('RequestFields:NewRule:' . $fieldsInfo->hash, null);
-        cache('RequestFields:Rule:' . $fieldsInfo->hash, null);
-        cache('ResponseFieldsRule:' . $fieldsInfo->hash, null);
+
+
+        $this->__deleteCacheOfRequestFields($fieldsInfo->hash);
 
         ApiFields::destroy($id);
 
@@ -199,9 +193,7 @@ class FieldsController extends BaseController
             (new ApiFields())->insert($addData);
         }
 
-        cache('RequestFields:NewRule:' . $hash, null);
-        cache('RequestFields:Rule:' . $hash, null);
-        cache('ResponseFieldsRule:' . $hash, null);
+        $this->__deleteCacheOfRequestFields($hash);
 
         return $this->buildSuccess();
     }
@@ -266,5 +258,12 @@ class FieldsController extends BaseController
             return false;
         }
         return array_keys($arr) !== range(0, count($arr) - 1);
+    }
+
+    protected function __deleteCacheOfRequestFields($hash)
+    {
+        Cache::delete('RequestFields:NewRule:' . $hash);
+        Cache::delete('RequestFields:Rule:' . $hash);
+        Cache::delete('ResponseFieldsRule:' . $hash);
     }
 }

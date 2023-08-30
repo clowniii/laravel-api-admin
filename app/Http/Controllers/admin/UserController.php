@@ -7,12 +7,20 @@ use App\Models\Admin\AdminUser;
 use App\Models\Admin\AdminUserData;
 use App\tools\ReturnCode;
 use App\tools\Tools;
+use Cache;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class UserController extends BaseController
 {
+
+    public function __construct(Request $request)
+    {
+        parent::__construct($request);
+        $this->modelObj = new AdminUser();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -26,7 +34,7 @@ class UserController extends BaseController
         $keywords = $this->request->get('keywords', '');
         $status   = $this->request->get('status', '');
 
-        $obj = new AdminUser();
+        $obj = $this->modelObj;
         if (strlen($status)) {
             $obj = $obj->where('status', $status);
         }
@@ -138,17 +146,17 @@ class UserController extends BaseController
 
     public function changeStatus()
     {
-        $id     = $this->request->get('id');
-        $status = $this->request->get('status');
-        $res    = AdminUser::update([
-            'id'     => $id,
-            'status' => $status,
-        ]);
-        if ($res === false) {
+        $id = $this->request->get('id');
+
+        if (Tools::isAdministrator($id)) {
+            return $this->buildFailed(ReturnCode::INVALID, "超级管理员不允许修改状态");
+        }
+        $res = $this->_changeStatus();
+        if (!$res) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
         if ($oldAdmin = cache('Login:' . $id)) {
-            cache('Login:' . $oldAdmin, null);
+            Cache::delete('Login:' . $oldAdmin);
         }
 
         return $this->buildSuccess();
@@ -172,19 +180,19 @@ class UserController extends BaseController
             $groups = trim(implode(',', $postData['group_id']), ',');
             unset($postData['group_id']);
         }
-        $res = AdminUser::update($postData);
+        $res = $this->modelObj->update($postData);
         if ($res === false) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
         $has = (new AdminAuthGroupAccess())->where('uid', $postData['id'])->select()->toArray();
         if (count($has)) {
-            AdminAuthGroupAccess::update([
+            (new AdminAuthGroupAccess())->update([
                 'group_id' => $groups,
             ], [
                 'uid' => $postData['id'],
             ]);
         } else {
-            AdminAuthGroupAccess::create([
+            (new AdminAuthGroupAccess())->create([
                 'uid'      => $postData['id'],
                 'group_id' => $groups,
             ]);
@@ -219,7 +227,7 @@ class UserController extends BaseController
         }
         $postData['id'] = $this->userInfo['id'];
         unset($postData['head_img']);
-        $res = AdminUser::update($postData);
+        $res = $this->modelObj->update($postData);
         if ($res === false) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }

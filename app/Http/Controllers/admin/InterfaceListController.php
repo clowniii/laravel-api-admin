@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\admin;
 
-use App\Models\Admin\AdminApp;
 use App\Models\Admin\ApiFields;
 use App\Models\Admin\ApiList;
 use App\tools\ReturnCode;
@@ -11,6 +10,11 @@ use Illuminate\Http\Response;
 
 class InterfaceListController extends BaseController
 {
+    public function __construct(Request $request)
+    {
+        parent::__construct($request);
+        $this->modelObj = new ApiList();
+    }
     /**
      * Display a listing of the resource.
      *

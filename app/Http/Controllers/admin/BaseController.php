@@ -19,7 +19,7 @@ class BaseController extends Controller
 
     public function __construct(Request $request)
     {
-        $this->request  = $request;
+        $this->request = $request;
 
         $this->userInfo = $request['API_ADMIN_USER_INFO'];
     }
@@ -67,22 +67,23 @@ class BaseController extends Controller
     {
         $apiAuth = $this->request->header('Api-Auth');
         if ($isDetail) {
-            (new \App\Models\Admin\AdminUserData)->update($data, ['uid' => $this->userInfo['id']]);
-            $this->userInfo['userData'] = (new AdminUserData())->where('uid', $this->userInfo['id'])->find();
+            (new AdminUserData)->update($data, ['uid' => $this->userInfo['id']]);
+            $this->userInfo['userData'] = (new AdminUserData())->where('uid', $this->userInfo['id'])->first();
         } else {
-            (new \App\Models\Admin\AdminUser)->update($data, ['id' => $this->userInfo['id']]);
+            (new AdminUser)->update($data, ['id' => $this->userInfo['id']]);
             $detail                     = $this->userInfo['userData'];
-            $this->userInfo             = (new AdminUser())::where('id', $this->userInfo['id'])->find();
+            $this->userInfo             = (new AdminUser())::where('id', $this->userInfo['id'])->first();
             $this->userInfo['userData'] = $detail;
         }
 
-        cache('Login:' . $apiAuth, json_encode($this->userInfo), config('laravelapi.ONLINE_TIME'));
+        cache('Login:' . $apiAuth, json_encode($this->userInfo), config('laravelapi.online_time'));
     }
 
-    public function _changeStatus($data, $model): bool
+    public function _changeStatus($id = ""): bool
     {
-
-        if ($model->update($data)) {
+        $id     = $id ?: $this->request->get('id');
+        $status = $this->request->get('status');
+        if ($this->modelObj->where("id", $id)->update([ "status" => $status])) {
             return true;
         }
         return false;

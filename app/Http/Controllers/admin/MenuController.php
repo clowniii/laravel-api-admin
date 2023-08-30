@@ -9,6 +9,12 @@ use Illuminate\Http\Request;
 
 class MenuController extends BaseController
 {
+
+    public function __construct(Request $request)
+    {
+        parent::__construct($request);
+        $this->modelObj = new AdminMenu();
+    }
     /**
      * Display a listing of the resource.
      *

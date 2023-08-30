@@ -8,6 +8,7 @@ use App\Models\Admin\ApiApp;
 use App\tools\ReturnCode;
 use App\tools\Strs;
 use App\tools\Tools;
+use Cache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -18,7 +19,7 @@ class AppController extends BaseController
     public function __construct(Request $request)
     {
         parent::__construct($request);
-        $this->model = new ApiApp();
+        $this->modelObj = new ApiApp();
     }
 
     /**
@@ -63,8 +64,7 @@ class AppController extends BaseController
         foreach ($apiArr as $api) {
             $res['apiList'][$api['group_hash']][] = $api;
         }
-        $groupArr         = (new ApiGroup())->get();
-        $groupArr         = Tools::buildArrFromObj($groupArr);
+        $groupArr         = (new ApiGroup())->get()->toArray();
         $res['groupInfo'] = array_column($groupArr, 'name', 'hash');
         $id               = $this->request->get('id', 0);
         if ($id) {
@@ -122,20 +122,16 @@ class AppController extends BaseController
     public function changeStatus(): array
     {
         $id     = $this->request->get('id');
-        $status = $this->request->get('status');
 
-        $res = $this->_changeStatus([
-            'id'     => $id,
-            'status' => $status
-        ], (new ApiApp()));
+        $res = $this->_changeStatus($id);
 
         if ($res === false) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
         $appInfo = (new ApiApp())->find($id);
-        cache('AccessToken:Easy:' . $appInfo['app_secret'], null);
+        Cache::delete('AccessToken:Easy:' . $appInfo['app_secret']);
         if ($oldWiki = cache('WikiLogin:' . $id)) {
-            cache('WikiLogin:' . $oldWiki, null);
+            Cache::delete('WikiLogin:' . $oldWiki);
         }
 
         return $this->buildSuccess();
@@ -165,13 +161,14 @@ class AppController extends BaseController
             $data['app_api'] = implode(',', $appApi);
         }
         $res = (new ApiApp())->update($data, ['id' => $postData['id']]);
-        if ($res === false) {
+        if (!$res) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
         $appInfo = (new ApiApp())->find($postData['id']);
-        cache('AccessToken:Easy:' . $appInfo['app_secret'], null);
+
+        Cache::delete('AccessToken:Easy:' . $appInfo['app_secret']);
         if ($oldWiki = cache('WikiLogin:' . $postData['id'])) {
-            cache('WikiLogin:' . $oldWiki, null);
+            Cache::delete('WikiLogin:' . $oldWiki);
         }
 
         return $this->buildSuccess();
@@ -187,11 +184,10 @@ class AppController extends BaseController
             return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
         $appInfo = (new ApiApp())->find($id);
-        cache('AccessToken:Easy:' . $appInfo['app_secret'], null);
-
+        Cache::delete('AccessToken:Easy:' . $appInfo['app_secret']);
         ApiApp::destroy($id);
         if ($oldWiki = cache('WikiLogin:' . $id)) {
-            cache('WikiLogin:' . $oldWiki, null);
+            Cache::delete('WikiLogin:' . $oldWiki);
         }
 
         return $this->buildSuccess();

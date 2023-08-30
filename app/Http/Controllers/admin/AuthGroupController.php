@@ -13,6 +13,12 @@ use Illuminate\Http\Response;
 
 class AuthGroupController extends BaseController
 {
+
+    public function __construct(Request $request)
+    {
+        parent::__construct($request);
+        $this->modelObj = new AdminAuthGroup();
+    }
     /**
      * Display a listing of the resource.
      *
@@ -43,7 +49,7 @@ class AuthGroupController extends BaseController
 
     public function getGroups(): array
     {
-        $listInfo = (new AdminAuthGroup())->where(['status' => 1])->orderBy('id', 'DESC')->select()->toArray();
+        $listInfo = (new AdminAuthGroup())->where(['status' => 1])->orderBy('id', 'DESC')->get()->toArray();
         $count    = count($listInfo);
 
         return $this->buildSuccess([
@@ -60,7 +66,7 @@ class AuthGroupController extends BaseController
 
         $rules = [];
         if ($groupId) {
-            $rules = (new AdminAuthRule())->where(['group_id' => $groupId])->select()->toArray();
+            $rules = (new AdminAuthRule())->where(['group_id' => $groupId])->get()->toArray();
             $rules = array_column($rules, 'url');
         }
         $newList = $this->buildList($list, $rules);
@@ -100,7 +106,7 @@ class AuthGroupController extends BaseController
             'name'        => $this->request->post('name', ''),
             'description' => $this->request->post('description', '')
         ]);
-        if ($res === false) {
+        if (!$res) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
 

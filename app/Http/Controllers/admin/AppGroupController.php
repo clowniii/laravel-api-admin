@@ -12,6 +12,12 @@ use mysql_xdevapi\Exception;
 
 class AppGroupController extends BaseController
 {
+
+    public function __construct(Request $request)
+    {
+        parent::__construct($request);
+        $this->modelObj = new ApiAppGroup();
+    }
     /**
      * Display a listing of the resource.
      *
@@ -60,13 +66,8 @@ class AppGroupController extends BaseController
 
     public function changeStatus(): array
     {
-        $id     = $this->request->get('id');
-        $status = $this->request->get('status');
 
-        $res = $this->_changeStatus([
-            'id'     => $id,
-            'status' => $status
-        ], (new ApiAppGroup()));
+        $res = $this->_changeStatus();
 
         if ($res === false) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);

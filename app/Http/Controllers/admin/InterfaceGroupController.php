@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\admin;
 
-use App\Models\Admin\AdminApp;
+use App\Models\Admin\ApiApp;
 use App\Models\Admin\ApiGroup;
 use App\Models\Admin\ApiList;
 use App\tools\ReturnCode;
@@ -11,6 +11,12 @@ use Illuminate\Http\Response;
 
 class InterfaceGroupController extends BaseController
 {
+
+    public function __construct(Request $request)
+    {
+        parent::__construct($request);
+        $this->modelObj = new ApiGroup();
+    }
     /**
      * Display a listing of the resource.
      *
@@ -86,7 +92,7 @@ class InterfaceGroupController extends BaseController
     {
         $postData = $this->request->post();
         $res      = ApiGroup::create($postData);
-        if ($res == false) {
+        if (!$res) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
 
@@ -112,18 +118,6 @@ class InterfaceGroupController extends BaseController
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
      * @return array
@@ -139,7 +133,7 @@ class InterfaceGroupController extends BaseController
         }
 
         ApiList::update(['group_hash' => 'default'], ['group_hash' => $hash]);
-        $hashRule = (new AdminApp())->where('app_api_show', "like", "%$hash%")->select();
+        $hashRule = (new ApiApp())->where('app_api_show', "like", "%$hash%")->select();
         if ($hashRule) {
             foreach ($hashRule as $rule) {
                 $appApiShowArr = json_decode($rule->app_api_show, true);
