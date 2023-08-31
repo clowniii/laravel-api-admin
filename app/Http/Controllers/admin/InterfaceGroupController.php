@@ -6,6 +6,7 @@ use App\Models\Admin\ApiApp;
 use App\Models\Admin\ApiGroup;
 use App\Models\Admin\ApiList;
 use App\tools\ReturnCode;
+use App\tools\Tools;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -70,12 +71,7 @@ class InterfaceGroupController extends BaseController
      */
     public function changeStatus()
     {
-        $id     = $this->request->get('id');
-        $status = $this->request->get('status');
-        $res    = ApiGroup::update([
-            'id'     => $id,
-            'status' => $status,
-        ]);
+        $res    = $this->_changeStatus();
         if ($res === false) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
@@ -91,6 +87,7 @@ class InterfaceGroupController extends BaseController
     public function create()
     {
         $postData = $this->request->post();
+        $postData = Tools::delEmptyKey($postData);
         $res      = ApiGroup::create($postData);
         if (!$res) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
@@ -109,7 +106,7 @@ class InterfaceGroupController extends BaseController
     public function edit()
     {
         $postData = $this->request->post();
-        $res      = ApiGroup::update($postData);
+        $res      = $this->modelObj->update($postData);
         if ($res === false) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
@@ -132,7 +129,7 @@ class InterfaceGroupController extends BaseController
             return $this->buildFailed(ReturnCode::INVALID, '系统预留关键数据，禁止删除！');
         }
 
-        ApiList::update(['group_hash' => 'default'], ['group_hash' => $hash]);
+        (new ApiList())->update(['group_hash' => 'default'], ['group_hash' => $hash]);
         $hashRule = (new ApiApp())->where('app_api_show', "like", "%$hash%")->select();
         if ($hashRule) {
             foreach ($hashRule as $rule) {

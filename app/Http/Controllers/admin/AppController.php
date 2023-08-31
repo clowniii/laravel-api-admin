@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\DB;
 
 class AppController extends BaseController
 {
-    protected ?ApiApp $model = null;
 
     public function __construct(Request $request)
     {
@@ -36,7 +35,7 @@ class AppController extends BaseController
         $type     = $request->get('type', '');
         $status   = $request->get('status', '');
 
-        $obj = $this->model;
+        $obj = $this->modelObj;
         if (strlen($status)) {
             $obj = $obj->where('app_status', $status);
         }

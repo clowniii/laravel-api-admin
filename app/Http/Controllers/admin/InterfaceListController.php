@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers\admin;
 
+use App\Models\Admin\ApiApp;
 use App\Models\Admin\ApiFields;
 use App\Models\Admin\ApiList;
 use App\tools\ReturnCode;
+use App\tools\Tools;
+use Cache;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Psr\SimpleCache\InvalidArgumentException;
 
 class InterfaceListController extends BaseController
 {
@@ -74,6 +78,7 @@ class InterfaceListController extends BaseController
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '真实类名只允许填写字母，数字和/');
         }
 
+        $postData = Tools::delEmptyKey($postData);
         $res = ApiList::create($postData);
         if ($res === false) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
@@ -86,7 +91,7 @@ class InterfaceListController extends BaseController
     {
         $hash   = $this->request->get('hash');
         $status = $this->request->get('status');
-        $res    = ApiList::update([
+        $res    = $this->modelObj->update([
             'status' => $status
         ], [
             'hash' => $hash
@@ -112,7 +117,8 @@ class InterfaceListController extends BaseController
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '真实类名只允许填写字母，数字和/');
         }
 
-        $res = ApiList::update($postData);
+
+        $res = $this->modelObj->update($postData);
         if ($res === false) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
@@ -122,21 +128,10 @@ class InterfaceListController extends BaseController
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
      * @return array
+     * @throws InvalidArgumentException
      */
     public function destroy()
     {
@@ -145,9 +140,9 @@ class InterfaceListController extends BaseController
             return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
 
-        $hashRule = (new AdminApp())->where('app_api', "like", "%$hash%")->select();
+        $hashRule = (new ApiApp())->where('app_api', "like", "%$hash%")->get();
         if ($hashRule) {
-            $oldInfo = (new ApiList())->where('hash', $hash)->find();
+            $oldInfo = (new ApiList())->where('hash', $hash)->first();
             foreach ($hashRule as $rule) {
                 $appApiArr   = explode(',', $rule->app_api);
                 $appApiIndex = array_search($hash, $appApiArr);
@@ -168,7 +163,7 @@ class InterfaceListController extends BaseController
         ApiList::destroy(['hash' => $hash]);
         ApiFields::destroy(['hash' => $hash]);
 
-        cache('ApiInfo:' . $hash, null);
+        Cache::delete('ApiInfo:' . $hash);
 
         return $this->buildSuccess();
     }

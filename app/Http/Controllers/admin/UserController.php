@@ -24,7 +24,7 @@ class UserController extends BaseController
     /**
      * Display a listing of the resource.
      *
-     * @return array|Response
+     * @return array
      */
     public function index()
     {
@@ -93,8 +93,13 @@ class UserController extends BaseController
             $groups = trim(implode(',', $postData['group_id']), ',');
             unset($postData['group_id']);
         }
+        foreach ($postData as $k => $v){
+            if ($v == null){
+                unset($postData[$k]);
+            }
+        }
         $res = AdminUser::create($postData);
-        if ($res === false) {
+        if (!$res) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
         AdminAuthGroupAccess::create([
@@ -126,7 +131,7 @@ class UserController extends BaseController
         $userInfo = Db::query($sql);
 
         $uidArr   = array_column((array)$userInfo, 'id');
-        $userData = (new AdminUserData())->whereIn('uid', $uidArr)->select();
+        $userData = (new AdminUserData())->whereIn('uid', $uidArr)->get()->toArray();
         $userData = Tools::buildArrByNewKey($userData, 'uid');
 
         foreach ($userInfo as $key => $value) {
@@ -249,7 +254,7 @@ class UserController extends BaseController
      */
     public function destroy()
     {
-        $id = $this->request->get('id/d');
+        $id = $this->request->get('id');
         if (!$id) {
             return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
@@ -261,7 +266,7 @@ class UserController extends BaseController
         AdminUser::destroy($id);
         AdminAuthGroupAccess::destroy(['uid' => $id]);
         if ($oldAdmin = cache('Login:' . $id)) {
-            cache('Login:' . $oldAdmin, null);
+            Cache::delete('Login:' . $oldAdmin);
         }
 
         return $this->buildSuccess();

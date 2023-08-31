@@ -96,6 +96,7 @@ class FieldsController extends BaseController
         $postData['show_name'] = $postData['field_name'];
         $postData['default']   = $postData['defaults'];
         unset($postData['defaults']);
+        $postData = Tools::delEmptyKey($postData);
         $res = ApiFields::create($postData);
 
 

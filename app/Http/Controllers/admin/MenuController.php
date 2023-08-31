@@ -15,6 +15,7 @@ class MenuController extends BaseController
         parent::__construct($request);
         $this->modelObj = new AdminMenu();
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -45,11 +46,19 @@ class MenuController extends BaseController
     public function create()
     {
         $postData = $this->request->post();
+
         if ($postData['url']) {
             $postData['url'] = 'admin/' . $postData['url'];
         }
+        $postData = Tools::delEmptyKey($postData);
+
+        unset($postData['children']);
+        unset($postData['nodeKey']);
+        unset($postData['selected']);
+        unset($postData['API_ADMIN_USER_INFO']);
+
         $res = AdminMenu::create($postData);
-        if ($res === false) {
+        if (!$res) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         } else {
             return $this->buildSuccess();
@@ -60,7 +69,7 @@ class MenuController extends BaseController
     {
         $id     = $this->request->get('id');
         $status = $this->request->get('status');
-        $res    = AdminMenu::update([
+        $res    = $this->modelObj->update([
             'id'   => $id,
             'show' => $status
         ]);
@@ -80,11 +89,19 @@ class MenuController extends BaseController
     public function edit()
     {
         $postData = $this->request->post();
+
         if ($postData['url']) {
             $postData['url'] = 'admin/' . $postData['url'];
         }
-        $res = AdminMenu::update($postData);
-        if ($res === false) {
+
+        $postData['url'] = $postData['url'] ?: '';
+        unset($postData['children']);
+        unset($postData['nodeKey']);
+        unset($postData['selected']);
+        unset($postData['API_ADMIN_USER_INFO']);
+
+        $res = $this->modelObj->where("id", $postData['id'])->update($postData);
+        if (!$res) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
 
@@ -103,7 +120,7 @@ class MenuController extends BaseController
         if (!$id) {
             return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
-        (new AdminMenu())->whereIn('id', $id)->delete();
+        (new AdminMenu())->where('id', $id)->delete();
 
         return $this->buildSuccess();
     }

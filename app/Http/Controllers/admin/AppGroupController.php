@@ -6,6 +6,7 @@ use App\Models\Admin\AdminApp;
 use App\Models\Admin\ApiApp;
 use App\Models\Admin\ApiAppGroup;
 use App\tools\ReturnCode;
+use App\tools\Tools;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use mysql_xdevapi\Exception;
@@ -18,6 +19,7 @@ class AppGroupController extends BaseController
         parent::__construct($request);
         $this->modelObj = new ApiAppGroup();
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -84,8 +86,13 @@ class AppGroupController extends BaseController
     public function create()
     {
         $postData = $this->request->post();
+
         try {
-            ApiAppGroup::create($postData);
+            $model = new ApiAppGroup();
+            $model->name = $postData['name'];
+            $model->description = $postData['description'];
+            $model->hash = $postData['hash'];
+            $model->create($postData);
             return $this->buildSuccess();
         } catch (Exception $exception) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, $exception->getMessage());

@@ -117,6 +117,20 @@ class Tools
     }
 
     /**
+     * 去除空key
+     * @param $array
+     * @return array
+     */
+    public static function delEmptyKey($array): array
+    {
+        foreach ($array as $k=>$item) {
+            unset($array[$k]);
+        }
+
+        return $array;
+    }
+
+    /**
      * 把返回的数据集转换成Tree
      * @param array $list
      * @param string $pk
