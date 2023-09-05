@@ -28,11 +28,11 @@ class UserController extends BaseController
      */
     public function index()
     {
-        $limit    = $this->request->get('size', config('laravelapi.limit_default'));
-        $start    = $this->request->get('page', 1);
-        $type     = $this->request->get('type', '');
+        $limit = $this->request->get('size', config('laravelapi.limit_default'));
+        $start = $this->request->get('page', 1);
+        $type = $this->request->get('type', '');
         $keywords = $this->request->get('keywords', '');
-        $status   = $this->request->get('status', '');
+        $status = $this->request->get('status', '');
 
         $obj = $this->modelObj;
         if (strlen($status)) {
@@ -54,16 +54,16 @@ class UserController extends BaseController
             ->paginate($limit, ['*'], "page", $start);
 
         $listInfo = $listObj->items();
-        $idArr    = array_column($listInfo, 'id');
+        $idArr = array_column($listInfo, 'id');
 
         $userGroup = (new AdminAuthGroupAccess())->whereIn('uid', $idArr)->get()->toArray();
         $userGroup = Tools::buildArrByNewKey($userGroup, 'uid');
 
         foreach ($listInfo as &$value) {
             if ($value['userData']) {
-                $value['userData']['last_login_ip']   = long2ip($value['userData']['last_login_ip']);
+                $value['userData']['last_login_ip'] = long2ip($value['userData']['last_login_ip']);
                 $value['userData']['last_login_time'] = date('Y-m-d H:i:s', $value['userData']['last_login_time']);
-                $value['create_ip']                   = long2ip($value['create_ip']);
+                $value['create_ip'] = long2ip($value['create_ip']);
             }
             if (isset($userGroup[$value['id']])) {
                 $value['group_id'] = explode(',', $userGroup[$value['id']]['group_id']);
@@ -73,7 +73,7 @@ class UserController extends BaseController
         }
 
         return $this->buildSuccess([
-            'list'  => $listInfo,
+            'list' => $listInfo,
             'count' => $listObj->total(),
         ]);
     }
@@ -85,16 +85,16 @@ class UserController extends BaseController
      */
     public function create()
     {
-        $groups                = '';
-        $postData              = $this->request->post();
+        $groups = '';
+        $postData = $this->request->post();
         $postData['create_ip'] = sprintf("%u", ip2long($this->request->ip()));
-        $postData['password']  = Tools::userMd5($postData['password']);
+        $postData['password'] = Tools::userMd5($postData['password']);
         if (isset($postData['group_id']) && $postData['group_id']) {
             $groups = trim(implode(',', $postData['group_id']), ',');
             unset($postData['group_id']);
         }
-        foreach ($postData as $k => $v){
-            if ($v == null){
+        foreach ($postData as $k => $v) {
+            if ($v == null) {
                 unset($postData[$k]);
             }
         }
@@ -103,7 +103,7 @@ class UserController extends BaseController
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
         AdminAuthGroupAccess::create([
-            'uid'      => $res->id,
+            'uid' => $res->id,
             'group_id' => $groups,
         ]);
 
@@ -117,34 +117,34 @@ class UserController extends BaseController
     public function getUsers()
     {
         $limit = $this->request->get('size', config('apiadmin.ADMIN_LIST_DEFAULT'));
-        $page  = $this->request->get('page', 1);
-        $gid   = $this->request->get('gid', 0);
+        $page = $this->request->get('page', 1);
+        $gid = $this->request->get('gid', 0);
         if (!$gid) {
             return $this->buildFailed(ReturnCode::PARAM_INVALID, '非法操作');
         }
 
         $totalNum = (new AdminAuthGroupAccess())->where('find_in_set("' . $gid . '", `group_id`)')->count();
-        $start    = $limit * ($page - 1);
-        $sql      = "SELECT au.* FROM admin_user as au LEFT JOIN admin_auth_group_access as aaga " .
+        $start = $limit * ($page - 1);
+        $sql = "SELECT au.* FROM admin_user as au LEFT JOIN admin_auth_group_access as aaga " .
             " ON aaga.`uid` = au.`id` WHERE find_in_set('{$gid}', aaga.`group_id`) " .
             " ORDER BY au.create_time DESC LIMIT {$start}, {$limit}";
         $userInfo = Db::query($sql);
 
-        $uidArr   = array_column((array)$userInfo, 'id');
+        $uidArr = array_column((array)$userInfo, 'id');
         $userData = (new AdminUserData())->whereIn('uid', $uidArr)->get()->toArray();
         $userData = Tools::buildArrByNewKey($userData, 'uid');
 
         foreach ($userInfo as $key => $value) {
             if (isset($userData[$value['id']])) {
-                $userInfo[$key]['last_login_ip']   = long2ip($userData[$value['id']]['last_login_ip']);
-                $userInfo[$key]['login_times']     = $userData[$value['id']]['login_times'];
+                $userInfo[$key]['last_login_ip'] = long2ip($userData[$value['id']]['last_login_ip']);
+                $userInfo[$key]['login_times'] = $userData[$value['id']]['login_times'];
                 $userInfo[$key]['last_login_time'] = date('Y-m-d H:i:s', $userData[$value['id']]['last_login_time']);
             }
             $userInfo[$key]['create_ip'] = long2ip($userInfo[$key]['create_ip']);
         }
 
         return $this->buildSuccess([
-            'list'  => $userInfo,
+            'list' => $userInfo,
             'count' => $totalNum,
         ]);
     }
@@ -174,36 +174,39 @@ class UserController extends BaseController
      */
     public function edit()
     {
-        $groups   = '';
-        $postData = $this->request->post();
-        if ($postData['password'] === 'ApiAdmin') {
-            unset($postData['password']);
-        } else {
-            $postData['password'] = Tools::userMd5($postData['password']);
+        $groups = '';
+        $id = $this->request->post("id");
+        $password = $this->request->post("password");
+        $username = $this->request->post("username");
+        $nickname = $this->request->post("nickname");
+        $group_id = $this->request->post("group_id");
+        $password = Tools::userMd5($password);
+
+
+        if (isset($group_id) && $group_id) {
+            $groups = trim(implode(',', $group_id), ',');
         }
-        if (isset($postData['group_id']) && $postData['group_id']) {
-            $groups = trim(implode(',', $postData['group_id']), ',');
-            unset($postData['group_id']);
-        }
-        $res = $this->modelObj->update($postData);
+        $res = $this->modelObj->where('id', $id)->update([
+            "password" => $password,
+            "username" => $username,
+            "nickname" => $nickname,
+        ]);
         if ($res === false) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
-        $has = (new AdminAuthGroupAccess())->where('uid', $postData['id'])->select()->toArray();
+        $has = (new AdminAuthGroupAccess())->where('uid', $id)->get()->toArray();
         if (count($has)) {
-            (new AdminAuthGroupAccess())->update([
+            (new AdminAuthGroupAccess())->where("uid", $id)->update([
                 'group_id' => $groups,
-            ], [
-                'uid' => $postData['id'],
             ]);
         } else {
             (new AdminAuthGroupAccess())->create([
-                'uid'      => $postData['id'],
+                'uid' => $id,
                 'group_id' => $groups,
             ]);
         }
-        if ($oldAdmin = cache('Login:' . $postData['id'])) {
-            cache('Login:' . $oldAdmin, null);
+        if ($oldAdmin = cache('Login:' . $id)) {
+            Cache::delete('Login:' . $oldAdmin);
         }
 
         return $this->buildSuccess();
@@ -216,7 +219,7 @@ class UserController extends BaseController
     public function own()
     {
         $postData = $this->request->post();
-        $headImg  = $postData['head_img'];
+        $headImg = $postData['head_img'];
 
         if ($postData['password'] && $postData['oldPassword']) {
             $oldPass = Tools::userMd5($postData['oldPassword']);
@@ -236,7 +239,7 @@ class UserController extends BaseController
         if ($res === false) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
-        $userData           = (new AdminUserData())->where('uid', $postData['id'])->find();
+        $userData = (new AdminUserData())->where('uid', $postData['id'])->find();
         $userData->head_img = $headImg;
         $userData->save();
         if ($oldWiki = cache('WikiLogin:' . $postData['id'])) {
