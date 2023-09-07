@@ -11,6 +11,7 @@ use Cache;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Psr\SimpleCache\InvalidArgumentException;
 
 class UserController extends BaseController
 {
@@ -171,6 +172,7 @@ class UserController extends BaseController
      * Show the form for editing the specified resource.
      *
      * @return array
+     * @throws InvalidArgumentException
      */
     public function edit()
     {
@@ -254,6 +256,7 @@ class UserController extends BaseController
      * Remove the specified resource from storage.
      *
      * @return array
+     * @throws InvalidArgumentException
      */
     public function destroy()
     {
