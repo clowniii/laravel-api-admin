@@ -29,11 +29,11 @@ class AppController extends BaseController
     public function index(Request $request)
     {
         //
-        $limit    = $request->get("size", config("laravelapi.limit_default"));
-        $start    = $request->get('page', 1);
+        $limit = $request->get("size", config("laravelapi.limit_default"));
+        $start = $request->get('page', 1);
         $keywords = $request->get('keywords', '');
-        $type     = $request->get('type', '');
-        $status   = $request->get('status', '');
+        $type = $request->get('type', '');
+        $status = $request->get('status', '');
 
         $obj = $this->modelObj;
         if (strlen($status)) {
@@ -52,7 +52,7 @@ class AppController extends BaseController
         $listObj = $obj->orderByDesc('app_add_time')->paginate($limit, ['*'], 'page', $start);
 
         return $this->buildSuccess([
-            'list'  => $listObj->items(),
+            'list' => $listObj->items(),
             'count' => $listObj->total()
         ]);
     }
@@ -63,14 +63,14 @@ class AppController extends BaseController
         foreach ($apiArr as $api) {
             $res['apiList'][$api['group_hash']][] = $api;
         }
-        $groupArr         = (new ApiGroup())->get()->toArray();
+        $groupArr = (new ApiGroup())->get()->toArray();
         $res['groupInfo'] = array_column($groupArr, 'name', 'hash');
-        $id               = $this->request->get('id', 0);
+        $id = $this->request->get('id', 0);
         if ($id) {
-            $appInfo           = (new ApiApp())->where('id', $id)->first()->toArray();
+            $appInfo = (new ApiApp())->where('id', $id)->first()->toArray();
             $res['app_detail'] = json_decode($appInfo['app_api_show'], true);
         } else {
-            $res['app_id']     = mt_rand(1, 9) . Strs::randString(7, 1);
+            $res['app_id'] = mt_rand(1, 9) . Strs::randString(7, 1);
             $res['app_secret'] = Strs::randString(32);
         }
 
@@ -92,18 +92,18 @@ class AppController extends BaseController
     public function create()
     {
         $postData = $this->request->post();
-        $data     = [
-            'app_id'       => $postData['app_id'],
-            'app_secret'   => $postData['app_secret'],
-            'app_name'     => $postData['app_name'],
-            'app_info'     => $postData['app_info'],
-            'app_group'    => $postData['app_group'],
+        $data = [
+            'app_id' => $postData['app_id'],
+            'app_secret' => $postData['app_secret'],
+            'app_name' => $postData['app_name'],
+            'app_info' => $postData['app_info'],
+            'app_group' => $postData['app_group'],
             'app_add_time' => time(),
-            'app_api'      => '',
+            'app_api' => '',
             'app_api_show' => ''
         ];
         if (isset($postData['app_api']) && $postData['app_api']) {
-            $appApi               = [];
+            $appApi = [];
             $data['app_api_show'] = json_encode($postData['app_api']);
             foreach ($postData['app_api'] as $value) {
                 $appApi = array_merge($appApi, $value);
@@ -120,7 +120,7 @@ class AppController extends BaseController
 
     public function changeStatus(): array
     {
-        $id     = $this->request->get('id');
+        $id = $this->request->get('id');
 
         $res = $this->_changeStatus($id);
 
@@ -143,26 +143,28 @@ class AppController extends BaseController
     public function edit()
     {
         $postData = $this->request->post();
-        $data     = [
-            'app_secret'   => $postData['app_secret'],
-            'app_name'     => $postData['app_name'],
-            'app_info'     => $postData['app_info'],
-            'app_group'    => $postData['app_group'],
-            'app_api'      => '',
+        $data = [
+            'app_secret' => $postData['app_secret'],
+            'app_name' => $postData['app_name'],
+            'app_info' => $postData['app_info'],
+            'app_group' => $postData['app_group'],
+            'app_api' => '',
             'app_api_show' => ''
         ];
         if (isset($postData['app_api']) && $postData['app_api']) {
-            $appApi               = [];
+            $appApi = [];
             $data['app_api_show'] = json_encode($postData['app_api']);
             foreach ($postData['app_api'] as $value) {
                 $appApi = array_merge($appApi, $value);
             }
             $data['app_api'] = implode(',', $appApi);
         }
-        $res = (new ApiApp())->update($data, ['id' => $postData['id']]);
+
+        $res = (new ApiApp())->where('id', $postData['id'])->update($data);
         if (!$res) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
+            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, "编辑失败");
         }
+
         $appInfo = (new ApiApp())->find($postData['id']);
 
         Cache::delete('AccessToken:Easy:' . $appInfo['app_secret']);
