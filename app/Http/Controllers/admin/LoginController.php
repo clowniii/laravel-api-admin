@@ -61,6 +61,7 @@ class LoginController extends BaseController
                 return $this->buildFailed(ReturnCode::LOGIN_ERROR, '用户已被封禁，请联系管理员');
             }
         } else {
+            var_dump();
             return $this->buildFailed(ReturnCode::LOGIN_ERROR, '用户名密码不正确');
         }
         $userInfo->access = $this->getAccess($userInfo->id);

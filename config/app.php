@@ -41,7 +41,7 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => (bool)env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -121,7 +121,7 @@ return [
     |
     */
 
-    'key' => env('APP_KEY','74c02c31-d768-d7ff-2744-d66355918f87'),
+    'key' => env('APP_KEY', '74c02c31-d768-d7ff-2744-d66355918f87'),
 
     'cipher' => 'AES-256-CBC',
 
@@ -196,6 +196,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        \Maatwebsite\Excel\ExcelServiceProvider::class
 
     ],
 
@@ -213,6 +214,7 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
 //        'Redis' => Illuminate\Support\Facades\Redis::class,
+        "Excel" => \Maatwebsite\Excel\ExcelServiceProvider::class
     ])->toArray(),
 
 ];
