@@ -19,7 +19,9 @@ class UserController extends BaseController
     public function __construct(Request $request)
     {
         parent::__construct($request);
+
         $this->modelObj = new AdminUser();
+        $this->userInfo = $request['API_ADMIN_USER_INFO'];
     }
 
     /**
@@ -220,13 +222,14 @@ class UserController extends BaseController
      */
     public function own()
     {
+        $this->userInfo = $this->request['API_ADMIN_USER_INFO'];
         $postData = $this->request->post();
         $headImg = $postData['head_img'];
 
         if ($postData['password'] && $postData['oldPassword']) {
             $oldPass = Tools::userMd5($postData['oldPassword']);
             unset($postData['oldPassword']);
-            if ($oldPass === $this->userInfo['password']) {
+            if ($oldPass == $this->userInfo['password']) {
                 $postData['password'] = Tools::userMd5($postData['password']);
             } else {
                 return $this->buildFailed(ReturnCode::INVALID, '原始密码不正确');
@@ -237,11 +240,13 @@ class UserController extends BaseController
         }
         $postData['id'] = $this->userInfo['id'];
         unset($postData['head_img']);
-        $res = $this->modelObj->update($postData);
+        unset($postData['API_ADMIN_USER_INFO']);
+
+        $res = $this->modelObj->where("id",$this->userInfo['id'])->update($postData);
         if ($res === false) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
-        $userData = (new AdminUserData())->where('uid', $postData['id'])->find();
+        $userData = (new AdminUserData())->where('uid', $postData['id'])->first();
         $userData->head_img = $headImg;
         $userData->save();
         if ($oldWiki = cache('WikiLogin:' . $postData['id'])) {

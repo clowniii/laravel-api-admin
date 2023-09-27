@@ -21,7 +21,7 @@ class BaseController extends Controller
     {
         $this->request = $request;
 
-        $this->userInfo = $request['API_ADMIN_USER_INFO'];
+//        $this->userInfo = $request['API_ADMIN_USER_INFO'];
     }
 
     public function buildSuccess(array|null $data = [], string $msg = '操作成功', int $code = ReturnCode::SUCCESS)
