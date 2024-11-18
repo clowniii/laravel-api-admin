@@ -40,13 +40,13 @@ class ApiAuth
             if ($cached) {
                 $apiInfo = Cache::get('ApiInfo:' . $apiHash);
             } else {
-                $apiInfo = (new ApiList())->where('hash', $apiHash)->where('hash_type', 2)->find();
+                $apiInfo = (new ApiList())->where('hash', $apiHash)->where('hash_type', 2)->first();
                 if ($apiInfo) {
                     $apiInfo = $apiInfo->toArray();
                     Cache::delete('ApiInfo:' . $apiInfo['api_class']);
                     Cache::set('ApiInfo:' . $apiHash, $apiInfo);
                 } else {
-                    $apiInfo = (new ApiList())->where('api_class', $apiHash)->where('hash_type', 1)->find();
+                    $apiInfo = (new ApiList())->where('api_class', $apiHash)->where('hash_type', 1)->first();
                     if ($apiInfo) {
                         $apiInfo = $apiInfo->toArray();
                         Cache::delete('ApiInfo:' . $apiInfo['hash']);

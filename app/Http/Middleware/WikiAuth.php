@@ -20,7 +20,6 @@ class WikiAuth
      */
     public function handle(Request $request, Closure $next)
     {
-        $header  = config('laravelapi.CROSS_DOMAIN');
         $ApiAuth = $request->header('Api-Auth', '');
         if ($ApiAuth) {
             $userInfo = cache('Login:' . $ApiAuth);
@@ -35,18 +34,17 @@ class WikiAuth
                     'code' => ReturnCode::AUTH_ERROR,
                     'msg'  => 'ApiAuth不匹配',
                     'data' => []
-                ])->header("CROSS_DOMAIN", $header);
+                ]);
             } else {
-                $request->API_WIKI_USER_INFO = $userInfo;
+                $request->merge(["API_WIKI_USER_INFO"=> $userInfo]);
             }
-
             return $next($request);
         } else {
             return Response::json([
                 'code' => ReturnCode::AUTH_ERROR,
                 'msg'  => '缺少ApiAuth',
                 'data' => []
-            ])->header("CROSS_DOMAIN", $header);
+            ]);
         }
     }
 }

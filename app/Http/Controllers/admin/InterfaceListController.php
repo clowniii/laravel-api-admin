@@ -10,6 +10,7 @@ use App\tools\Tools;
 use Cache;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Psr\SimpleCache\InvalidArgumentException;
 
 class InterfaceListController extends BaseController
@@ -77,10 +78,11 @@ class InterfaceListController extends BaseController
         if (!preg_match("/^[A-Za-z0-9_\/]+$/", $postData['api_class'])) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '真实类名只允许填写字母，数字和/');
         }
-
+        unset($postData["API_ADMIN_USER_INFO"]);
         $postData = Tools::delEmptyKey($postData);
         $res = ApiList::create($postData);
-        if ($res === false) {
+
+        if ($res == false) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
 
@@ -116,9 +118,9 @@ class InterfaceListController extends BaseController
         if (!preg_match("/^[A-Za-z0-9_\/]+$/", $postData['api_class'])) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '真实类名只允许填写字母，数字和/');
         }
+        unset($postData["API_ADMIN_USER_INFO"]);
 
-
-        $res = $this->modelObj->update($postData);
+        $res = $this->modelObj->where("id",$postData["id"])->update($postData);
         if ($res === false) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
@@ -141,8 +143,9 @@ class InterfaceListController extends BaseController
         }
 
         $hashRule = (new ApiApp())->where('app_api', "like", "%$hash%")->get();
+        $oldInfo = (new ApiList())->where('hash', $hash)->first();
+
         if ($hashRule) {
-            $oldInfo = (new ApiList())->where('hash', $hash)->first();
             foreach ($hashRule as $rule) {
                 $appApiArr   = explode(',', $rule->app_api);
                 $appApiIndex = array_search($hash, $appApiArr);
@@ -155,13 +158,13 @@ class InterfaceListController extends BaseController
                 array_splice($appApiShowArr, $appApiShowIndex, 1);
                 $appApiShowArrOld[$oldInfo->group_hash] = $appApiShowArr;
                 $rule->app_api_show                     = json_encode($appApiShowArrOld);
-
                 $rule->save();
             }
         }
 
-        ApiList::destroy(['hash' => $hash]);
-        ApiFields::destroy(['hash' => $hash]);
+        ApiList::where(['hash' => $hash])->delete();
+
+        ApiFields::where(['hash' => $hash])->delete();
 
         Cache::delete('ApiInfo:' . $hash);
 

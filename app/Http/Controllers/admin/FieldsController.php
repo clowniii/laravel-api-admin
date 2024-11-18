@@ -43,7 +43,7 @@ class FieldsController extends BaseController
 
     public function request(): array
     {
-        $limit = $this->request->get('size', config('laravelapi.list_default'));
+        $limit = $this->request->get('size', config('laravelapi.limit_default'));
         $start = $this->request->get('page', 1);
         $hash  = $this->request->get('hash', '');
 
@@ -51,7 +51,7 @@ class FieldsController extends BaseController
             return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
         $listObj = (new ApiFields())->where('hash', $hash)->where('type', 0)
-            ->paginate(['page' => $start, 'list_rows' => $limit]);
+            ->paginate($limit, ['*'], 'page', $start);
 
         $apiInfo = (new ApiList())->where('hash', $hash)->first();
 
@@ -59,13 +59,13 @@ class FieldsController extends BaseController
             'list'     => $listObj->items(),
             'count'    => $listObj->total(),
             'dataType' => $this->dataType,
-            'apiInfo'  => $apiInfo->toArray()
+            'apiInfo'  => $apiInfo
         ]);
     }
 
     public function response(): array
     {
-        $limit = $this->request->get('size', config('laravelapi.list_default'));
+        $limit = $this->request->get('size', config('laravelapi.limit_default'));
         $start = $this->request->get('page', 1);
         $hash  = $this->request->get('hash', '');
 
@@ -73,7 +73,7 @@ class FieldsController extends BaseController
             return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
         $listObj = (new ApiFields())->where('hash', $hash)->where('type', 1)
-            ->paginate(['page' => $start, 'list_rows' => $limit]);
+            ->paginate($limit, ['*'], 'page', $start);
 
         $apiInfo = (new ApiList())->where('hash', $hash)->first();
 
@@ -122,7 +122,9 @@ class FieldsController extends BaseController
         $postData['show_name'] = $postData['field_name'];
         $postData['default']   = $postData['defaults'];
         unset($postData['defaults']);
-        $res = (new ApiFields())->update($postData);
+        unset($postData['isMust']);
+        unset($postData['API_ADMIN_USER_INFO']);
+        $res = (new ApiFields())->where("id",$postData["id"])->update($postData);
 
 
         $this->__deleteCacheOfRequestFields($postData['hash']);
@@ -171,7 +173,7 @@ class FieldsController extends BaseController
         if ($data === null) {
             return $this->buildFailed(ReturnCode::EXCEPTION, 'JSON数据格式有误');
         }
-        ApiList::update(['return_str' => json_encode($data)], ['hash' => $hash]);
+        ApiList::where(['hash' => $hash])->update(['return_str' => json_encode($data)] );
         $dataArr = [];
         $this->handle($data['data'], $dataArr);
         $old    = (new ApiFields())->where('hash', $hash)->where('type', $type)->select();
@@ -261,7 +263,7 @@ class FieldsController extends BaseController
         return array_keys($arr) !== range(0, count($arr) - 1);
     }
 
-    protected function __deleteCacheOfRequestFields($hash)
+    protected function __deleteCacheOfRequestFields($hash): void
     {
         Cache::delete('RequestFields:NewRule:' . $hash);
         Cache::delete('RequestFields:Rule:' . $hash);

@@ -109,8 +109,9 @@ class AppGroupController extends BaseController
     public function edit()
     {
         $postData = $this->request->post();
+        unset($postData["API_ADMIN_USER_INFO"]);
         try {
-            (new ApiAppGroup)->update($postData);
+            (new ApiAppGroup)->where("id",$postData["id"])->update($postData);
             return $this->buildSuccess();
         } catch (Exception $exception) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, $exception->getMessage());
@@ -134,7 +135,7 @@ class AppGroupController extends BaseController
             return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '当前分组存在' . $has . '个应用，禁止删除');
         }
 
-        ApiAppGroup::destroy(['hash' => $hash]);
+        ApiAppGroup::where(['hash' => $hash])->delete();
 
         return $this->buildSuccess();
     }

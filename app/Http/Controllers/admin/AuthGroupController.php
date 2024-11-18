@@ -208,7 +208,7 @@ class AuthGroupController extends BaseController
         $rules = $this->request->post('rules', []);
         if (is_array($rules)) {
             $needAdd = [];
-            $has     = (new AdminAuthRule())->where(['group_id' => $id])->select()->toArray();
+            $has     = (new AdminAuthRule())->where(['group_id' => $id])->get()->toArray();
             $hasRule = array_column($has, 'url');
             $needDel = array_flip($hasRule);
             foreach ($rules as $key => $value) {

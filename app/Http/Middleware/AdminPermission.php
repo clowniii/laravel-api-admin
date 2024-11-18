@@ -51,13 +51,13 @@ class AdminPermission
     {
         $groups = (new AdminAuthGroupAccess())->where('uid', $uid)->first();
         if (isset($groups) && $groups->group_id) {
-            $openGroup = (new AdminAuthGroup())->whereIn('id', $groups->group_id)->where(['status' => 1])->get();
+            $openGroup = (new AdminAuthGroup())->whereIn('id', [$groups->group_id])->where(['status' => 1])->get();
             if (isset($openGroup)) {
                 $openGroupArr = [];
                 foreach ($openGroup as $group) {
                     $openGroupArr[] = $group->id;
                 }
-                $allRules = (new AdminAuthRule())->whereIn('group_id', $openGroupArr)->get();
+                $allRules = (new AdminAuthRule())->whereIn('group_id', [$openGroupArr])->get();
                 if (isset($allRules)) {
                     $rules = [];
                     foreach ($allRules as $rule) {

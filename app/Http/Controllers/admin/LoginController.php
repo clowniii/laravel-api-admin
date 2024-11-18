@@ -21,7 +21,10 @@ class LoginController extends BaseController
      * @return array
      */
 
-
+    public function __construct(Request $request)
+    {
+        parent::__construct($request);
+    }
     public function index()
     {
         $username = $this->request->post('username');
@@ -61,7 +64,7 @@ class LoginController extends BaseController
                 return $this->buildFailed(ReturnCode::LOGIN_ERROR, '用户已被封禁，请联系管理员');
             }
         } else {
-            return $this->buildFailed(ReturnCode::LOGIN_ERROR, '用户名密码不正确');
+            return $this->buildFailed(ReturnCode::LOGIN_ERROR, '用户名密码不正确'.$password);
         }
         $userInfo->access = $this->getAccess($userInfo->id);
         $userInfo->menu   = $this->getAccessMenuData($userInfo->id);
@@ -82,11 +85,11 @@ class LoginController extends BaseController
         return $this->buildSuccess($request["API_ADMIN_USER_INFO"]);
     }
 
-    public function logout(): array
+    public function logout(Request $request): array
     {
-        $ApiAuth = $this->request->header('Api-Auth');
+        $ApiAuth = $request->header('Api-Auth');
         Cache::delete('Login:' . $ApiAuth);
-        Cache::delete('Login:' . $this->userInfo['id']);
+        Cache::delete('Login:' . $request["API_ADMIN_USER_INFO"]["id"]);
 
         return $this->buildSuccess([], '登出成功');
     }
@@ -111,7 +114,7 @@ class LoginController extends BaseController
         } else {
             $groups = (new AdminAuthGroupAccess())->where('uid', $uid)->first();
             if (isset($groups) && $groups->group_id) {
-                $access     = (new AdminAuthRule())->whereIn('group_id', $groups->group_id)->get()->toArray();
+                $access     = (new AdminAuthRule())->whereIn('group_id', [$groups->group_id])->get()->toArray();
                 $access     = array_unique(array_column($access, 'url'));
                 $access[]   = "";
                 $menus      = (new AdminMenu())->whereIn('url', $access)->where('show', 1)->get()->toArray();
@@ -138,7 +141,7 @@ class LoginController extends BaseController
         } else {
             $groups = (new AdminAuthGroupAccess())->where('uid', $uid)->first();
             if (isset($groups) && $groups->group_id) {
-                $access = (new AdminAuthRule())->whereIn('group_id', $groups->group_id)->get()->toArray();
+                $access = (new AdminAuthRule())->whereIn('group_id', [$groups->group_id])->get()->toArray();
                 return array_values(array_unique(array_column($access, 'url')));
             } else {
                 return [];

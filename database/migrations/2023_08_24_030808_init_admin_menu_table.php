@@ -376,7 +376,7 @@ return new class extends Migration {
             ], [
                 'id'    => 37,
                 'title'  => '获取接口请求字段',
-                'fid'   => 31,
+                'fid'   => 30,
                 'url'   => 'admin/Fields/request',
                 'auth'  => 0,
                 'sort'  => 0,
@@ -386,7 +386,7 @@ return new class extends Migration {
             ], [
                 'id'    => 38,
                 'title'  => '获取接口返回字段',
-                'fid'   => 31,
+                'fid'   => 30,
                 'url'   => 'admin/Fields/response',
                 'auth'  => 0,
                 'sort'  => 0,

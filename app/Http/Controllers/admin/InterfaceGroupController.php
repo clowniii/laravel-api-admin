@@ -147,7 +147,7 @@ class InterfaceGroupController extends BaseController
             }
         }
 
-        ApiGroup::destroy(['hash' => $hash]);
+        ApiGroup::where(['hash' => $hash])->delete();
 
         return $this->buildSuccess();
     }

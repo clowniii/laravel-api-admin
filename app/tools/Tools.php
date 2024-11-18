@@ -124,7 +124,9 @@ class Tools
     public static function delEmptyKey($array): array
     {
         foreach ($array as $k=>$item) {
-            unset($array[$k]);
+            if (empty($item)){
+                unset($array[$k]);
+            }
         }
 
         return $array;
