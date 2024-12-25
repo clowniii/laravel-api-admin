@@ -136,8 +136,7 @@ class AuthGroupController extends BaseController
      */
     public function edit()
     {
-        $res = (new AdminAuthGroup())->update([
-            'id'          => $this->request->post('id', 0),
+        $res = (new AdminAuthGroup())->where('id', $this->request->post('id'))->update([
             'name'        => $this->request->post('name', ''),
             'description' => $this->request->post('description', '')
         ]);
