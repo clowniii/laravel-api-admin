@@ -29,7 +29,7 @@ class UserController extends BaseController
      */
     public function index()
     {
-        $limit = $this->request->get('size', config('laravelapi.limit_default'));
+        $limit = $this->request->get('size', config('laravelApi.limit_default'));
         $start = $this->request->get('page', 1);
         $type = $this->request->get('type', '');
         $keywords = $this->request->get('keywords', '');
@@ -84,7 +84,7 @@ class UserController extends BaseController
      *
      * @return array
      */
-    public function create()
+    public function create(): array
     {
         $groups = '';
         $postData = $this->request->post();
@@ -115,7 +115,7 @@ class UserController extends BaseController
      * 获取当前组的全部用户
      * @return array
      */
-    public function getUsers()
+    public function getUsers(): array
     {
         $limit = $this->request->get('size', config('apiadmin.ADMIN_LIST_DEFAULT'));
         $page = $this->request->get('page', 1);
@@ -150,7 +150,7 @@ class UserController extends BaseController
         ]);
     }
 
-    public function changeStatus()
+    public function changeStatus(): array
     {
         $id = $this->request->get('id');
 

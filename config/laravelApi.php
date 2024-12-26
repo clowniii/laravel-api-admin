@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Facade;
 return [
 
     'app_version'           => '1.0',
-    'app_name'              => '【南京龙垣】API管理系统',
+    'app_name'              => '【*】API管理中心',
 
     //鉴权相关
     'user_administrator'    => [1],

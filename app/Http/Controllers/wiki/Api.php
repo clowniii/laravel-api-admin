@@ -130,7 +130,7 @@ class Api extends BaseController
 
         return $this->buildSuccess([
             'data' => $listInfo,
-            'co' => config('laravelapi.app_name') . ' ' . config('laravelapi.app_version'),
+            'co' => config('laravelApi.app_name') . ' ' . config('laravelApi.app_version'),
         ]);
     }
 
@@ -170,7 +170,7 @@ class Api extends BaseController
             'dataType' => $dataType,
             'apiList' => $apiList,
             'url' => $url,
-            'co' => config('laravelapi.app_name') . ' ' . config('laravelapi.app_version'),
+            'co' => config('laravelApi.app_name') . ' ' . config('laravelApi.app_version'),
         ]);
     }
 

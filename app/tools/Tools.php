@@ -51,7 +51,7 @@ class Tools
     public static function isAdministrator(int $uid = 0): bool
     {
         if (!empty($uid)) {
-            $adminConf = config('laravelapi.user_administrator');
+            $adminConf = config('laravelApi.user_administrator');
             if (is_array($adminConf)) {
                 if (is_array($uid)) {
                     $m = array_intersect($adminConf, $uid);

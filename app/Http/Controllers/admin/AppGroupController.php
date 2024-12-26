@@ -25,9 +25,9 @@ class AppGroupController extends BaseController
      *
      * @return array
      */
-    public function index()
+    public function index(): array
     {
-        $limit    = $this->request->get('size', config('laravelapi.limit_default'));
+        $limit    = $this->request->get('size', config('laravelApi.limit_default'));
         $start    = $this->request->get('page', 1);
         $keywords = $this->request->get('keywords', '');
         $type     = $this->request->get('type', '');
@@ -83,7 +83,7 @@ class AppGroupController extends BaseController
      *
      * @return array
      */
-    public function create()
+    public function create(): array
     {
         $postData = $this->request->post();
 
@@ -106,7 +106,7 @@ class AppGroupController extends BaseController
      *
      * @return array
      */
-    public function edit()
+    public function edit(): array
     {
         $postData = $this->request->post();
         unset($postData["API_ADMIN_USER_INFO"]);
@@ -123,7 +123,7 @@ class AppGroupController extends BaseController
      *
      * @return array
      */
-    public function destroy()
+    public function destroy(): array
     {
         $hash = $this->request->get('hash');
         if (!$hash) {

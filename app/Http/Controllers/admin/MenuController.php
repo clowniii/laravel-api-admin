@@ -21,7 +21,7 @@ class MenuController extends BaseController
      *
      * @return array
      */
-    public function index()
+    public function index(): array
     {
         $keywords = $this->request->get('keywords', '');
         $obj      = new AdminMenu();
@@ -43,7 +43,7 @@ class MenuController extends BaseController
      *
      * @return array
      */
-    public function create()
+    public function create(): array
     {
         $postData = $this->request->post();
 
@@ -86,7 +86,7 @@ class MenuController extends BaseController
      *
      * @return array
      */
-    public function edit()
+    public function edit(): array
     {
         $postData = $this->request->post();
 
@@ -114,7 +114,7 @@ class MenuController extends BaseController
      *
      * @return array
      */
-    public function destroy()
+    public function destroy(): array
     {
         $id = $this->request->get('id');
         if (!$id) {

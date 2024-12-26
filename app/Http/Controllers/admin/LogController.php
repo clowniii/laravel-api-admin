@@ -14,7 +14,7 @@ class LogController extends BaseController
      *
      * @return array
      */
-    public function index()
+    public function index(): array
     {
         $limit    = $this->request->get('size', config('apiadmin.limit_default'));
         $start    = $this->request->get('page', 1);
@@ -48,7 +48,7 @@ class LogController extends BaseController
      *
      * @return array
      */
-    public function destroy()
+    public function destroy(): array
     {
         $id = $this->request->get('id');
         if (!$id) {

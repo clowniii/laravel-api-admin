@@ -84,7 +84,7 @@ class ThirdLoginController extends BaseController
 
     /**
      * 获取授权登录的二维码
-     * @return Response|array
+     * @return array
      */
     public function getQr()
     {
@@ -281,7 +281,7 @@ class ThirdLoginController extends BaseController
      * @param array $userDetail
      * @return array
      */
-    private function doLogin(string $openid, array $userDetail)
+    private function doLogin(string $openid, array $userDetail): array
     {
         $userInfo = (new AdminUser())->where('openid', $openid)->first();
         if (empty($userInfo)) {

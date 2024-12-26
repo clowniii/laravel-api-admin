@@ -25,9 +25,9 @@ class InterfaceListController extends BaseController
      *
      * @return array
      */
-    public function index()
+    public function index(): array
     {
-        $limit    = $this->request->get('size', config('laravelapi.list_default'));
+        $limit    = $this->request->get('size', config('laravelApi.list_default'));
         $start    = $this->request->get('page', 1);
         $keywords = $this->request->get('keywords', '');
         $type     = $this->request->get('type', '');
@@ -62,7 +62,7 @@ class InterfaceListController extends BaseController
      * 获取接口唯一标识
      * @return array
      */
-    public function getHash()
+    public function getHash(): array
     {
         return $this->buildSuccess(["hash" => uniqid()]);
     }
@@ -72,7 +72,7 @@ class InterfaceListController extends BaseController
      *
      * @return array
      */
-    public function create()
+    public function create(): array
     {
         $postData = $this->request->post();
         if (!preg_match("/^[A-Za-z0-9_\/]+$/", $postData['api_class'])) {
@@ -82,7 +82,7 @@ class InterfaceListController extends BaseController
         $postData = Tools::delEmptyKey($postData);
         $res = ApiList::create($postData);
 
-        if ($res == false) {
+        if (!$res) {
             return $this->buildFailed(ReturnCode::DB_SAVE_ERROR);
         }
 
@@ -112,7 +112,7 @@ class InterfaceListController extends BaseController
      *
      * @return array
      */
-    public function edit()
+    public function edit(): array
     {
         $postData = $this->request->post();
         if (!preg_match("/^[A-Za-z0-9_\/]+$/", $postData['api_class'])) {
@@ -135,7 +135,7 @@ class InterfaceListController extends BaseController
      * @return array
      * @throws InvalidArgumentException
      */
-    public function destroy()
+    public function destroy(): array
     {
         $hash = $this->request->get('hash');
         if (!$hash) {
@@ -176,7 +176,7 @@ class InterfaceListController extends BaseController
      * 刷新接口路由
      * @return array
      */
-    public function refresh()
+    public function refresh(): array
     {
         $rootPath     = base_path();
         $apiRoutePath = $rootPath . 'route/apiRoute.php';

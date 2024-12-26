@@ -11,6 +11,7 @@ use App\tools\Tools;
 use Cache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Psr\SimpleCache\InvalidArgumentException;
 
 class AppController extends BaseController
 {
@@ -29,7 +30,7 @@ class AppController extends BaseController
     public function index(Request $request)
     {
         //
-        $limit = $request->get("size", config("laravelapi.limit_default"));
+        $limit = $request->get("size", config("laravelApi.limit_default"));
         $start = $request->get('page', 1);
         $keywords = $request->get('keywords', '');
         $type = $request->get('type', '');
@@ -118,6 +119,9 @@ class AppController extends BaseController
         return $this->buildSuccess();
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function changeStatus(): array
     {
         $id = $this->request->get('id');

@@ -24,7 +24,7 @@ class BaseController extends Controller
         $this->userInfo = $request['API_ADMIN_USER_INFO'];
     }
 
-    public function buildSuccess(array|null $data = [], string $msg = '操作成功', int $code = ReturnCode::SUCCESS)
+    public function buildSuccess(array|null $data = [], string $msg = '操作成功', int $code = ReturnCode::SUCCESS): array
     {
         $return = [
             'code' => $code,
@@ -38,7 +38,7 @@ class BaseController extends Controller
         return $return;
     }
 
-    public function buildFailed(int $code, string $msg = '操作失败', array|null $data = [])
+    public function buildFailed(int $code, string $msg = '操作失败', array|null $data = []): array
     {
         $return = [
             'code' => $code,
@@ -76,7 +76,7 @@ class BaseController extends Controller
             $this->userInfo['userData'] = $detail;
         }
 
-        cache('Login:' . $apiAuth, json_encode($this->userInfo), config('laravelapi.online_time'));
+        cache('Login:' . $apiAuth, json_encode($this->userInfo), config('laravelApi.online_time'));
     }
 
     public function _changeStatus($id = ""): bool

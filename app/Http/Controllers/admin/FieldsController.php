@@ -36,14 +36,14 @@ class FieldsController extends BaseController
      *
      * @return array
      */
-    public function index()
+    public function index(): array
     {
         return $this->buildSuccess($this->dataType);
     }
 
     public function request(): array
     {
-        $limit = $this->request->get('size', config('laravelapi.limit_default'));
+        $limit = $this->request->get('size', config('laravelApi.limit_default'));
         $start = $this->request->get('page', 1);
         $hash  = $this->request->get('hash', '');
 
@@ -65,7 +65,7 @@ class FieldsController extends BaseController
 
     public function response(): array
     {
-        $limit = $this->request->get('size', config('laravelapi.limit_default'));
+        $limit = $this->request->get('size', config('laravelApi.limit_default'));
         $start = $this->request->get('page', 1);
         $hash  = $this->request->get('hash', '');
 
@@ -90,7 +90,7 @@ class FieldsController extends BaseController
      *
      * @return array
      */
-    public function create()
+    public function create(): array
     {
         $postData              = $this->request->post();
         $postData['show_name'] = $postData['field_name'];
@@ -116,7 +116,7 @@ class FieldsController extends BaseController
      *
      * @return array
      */
-    public function edit()
+    public function edit(): array
     {
         $postData              = $this->request->post();
         $postData['show_name'] = $postData['field_name'];
@@ -142,7 +142,7 @@ class FieldsController extends BaseController
      *
      * @return array
      */
-    public function destroy()
+    public function destroy(): array
     {
         $id = $this->request->get('id');
         if (!$id) {

@@ -23,9 +23,9 @@ class InterfaceGroupController extends BaseController
      *
      * @return array
      */
-    public function index()
+    public function index(): array
     {
-        $limit    = $this->request->get('size', config('laravelapi.list_default'));
+        $limit    = $this->request->get('size', config('laravelApi.list_default'));
         $start    = $this->request->get('page', 1);
         $keywords = $this->request->get('keywords', '');
         $type     = $this->request->get('type', '');
@@ -57,7 +57,7 @@ class InterfaceGroupController extends BaseController
      * 获取全部有效的接口组
      * @return array
      */
-    public function getAll()
+    public function getAll(): array
     {
         $listInfo = (new ApiGroup())->where(['status' => 1])->get();
         return $this->buildSuccess([
@@ -69,7 +69,7 @@ class InterfaceGroupController extends BaseController
      * 接口组状态编辑
      * @return array
      */
-    public function changeStatus()
+    public function changeStatus(): array
     {
         $res    = $this->_changeStatus();
         if ($res === false) {
@@ -84,7 +84,7 @@ class InterfaceGroupController extends BaseController
      *
      * @return array
      */
-    public function create()
+    public function create(): array
     {
         $postData = $this->request->post();
         $postData = Tools::delEmptyKey($postData);
@@ -100,10 +100,9 @@ class InterfaceGroupController extends BaseController
     /**
      * Show the form for editing the specified resource.
      *
-     * @param int $id
      * @return array
      */
-    public function edit()
+    public function edit(): array
     {
         $postData = $this->request->post();
         $res      = $this->modelObj->update($postData);
@@ -119,7 +118,7 @@ class InterfaceGroupController extends BaseController
      *
      * @return array
      */
-    public function destroy()
+    public function destroy(): array
     {
         $hash = $this->request->get('hash');
         if (!$hash) {

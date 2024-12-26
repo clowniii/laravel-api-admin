@@ -25,7 +25,7 @@ class LoginController extends BaseController
     {
         parent::__construct($request);
     }
-    public function index()
+    public function index(): array
     {
         $username = $this->request->post('username');
         $password = $this->request->post('password');
@@ -72,8 +72,8 @@ class LoginController extends BaseController
         $apiAuth    = md5(uniqid() . time());
         $oldApiAuth = \Cache::get('Login:' . $userInfo['id']);
         \Cache::forget('Login:' . $oldApiAuth);
-        \Cache::put('Login:' . $apiAuth, json_encode($userInfo), config('laravelapi.online_time'));
-        \Cache::put('Login:' . $userInfo['id'], $apiAuth, config('laravelapi.online_time'));
+        \Cache::put('Login:' . $apiAuth, json_encode($userInfo), config('laravelApi.online_time'));
+        \Cache::put('Login:' . $userInfo['id'], $apiAuth, config('laravelApi.online_time'));
 
         $userInfo->apiAuth = $apiAuth;
 

@@ -24,9 +24,9 @@ class AuthGroupController extends BaseController
      *
      * @return array
      */
-    public function index()
+    public function index(): array
     {
-        $limit    = $this->request->get('size', config('laravelapi.limit_default'));
+        $limit    = $this->request->get('size', config('laravelApi.limit_default'));
         $start    = $this->request->get('page', 1);
         $keywords = $this->request->get('keywords', '');
         $status   = $this->request->get('status', '');
@@ -100,7 +100,7 @@ class AuthGroupController extends BaseController
      *
      * @return array
      */
-    public function create()
+    public function create(): array
     {
         $res = AdminAuthGroup::create([
             'name'        => $this->request->post('name', ''),
@@ -134,7 +134,7 @@ class AuthGroupController extends BaseController
      *
      * @return array
      */
-    public function edit()
+    public function edit(): array
     {
         $res = (new AdminAuthGroup())->where('id', $this->request->post('id'))->update([
             'name'        => $this->request->post('name', ''),
@@ -152,7 +152,7 @@ class AuthGroupController extends BaseController
      *
      * @return array
      */
-    public function destroy()
+    public function destroy(): array
     {
         $id = $this->request->get('id');
         if (!$id) {
